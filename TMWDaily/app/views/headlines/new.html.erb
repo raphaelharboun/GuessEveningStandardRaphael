@@ -1,0 +1,25 @@
+Headlines#new
+
+<div id="ui-user">
+	<% if user_signed_in? then %>
+		<p>You are logged in as <%= current_user.email %></p>
+		<%= link_to "logout", destroy_user_sessions_path %>
+	<% else %>
+		<%= render "devise/sessions/signin" %>
+	<% end %>
+</div>
+
+<h1>Guess Tomorrow Evening Standard Headline</h1>
+
+<% if @headline.errors.any? then %>
+	<ul>
+		<% @headline.errors.full_messages.each do |msg| %>
+			<li><%= msg %></li>
+		<% end %>
+	</ul>
+<% end  %>
+
+<%= form_for @headline do |f| %>
+	<%= f.text_field :name %>
+	<%= f.submit 'Print it!' %>
+<% end %>
