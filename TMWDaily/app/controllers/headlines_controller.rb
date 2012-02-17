@@ -14,4 +14,9 @@ class HeadlinesController < ApplicationController
 		end
 	end
 
+	def retrieve_index_infos
+		@last_devine_headlines = DevineUser.first.headlines
+	end
+
+
 end

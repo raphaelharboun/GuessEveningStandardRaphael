@@ -19,7 +19,7 @@ Headlines#new
 	</ul>
 <% end  %>
 
-<%= form_for @headline do |f| %>
+<%= form_for @headline, :url => new_index_headline_path do |f| %>
 	<%= f.text_field :name %>
 	<%= f.submit 'Print it!' %>
 <% end %>

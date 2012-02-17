@@ -22,6 +22,15 @@ class Headline < ActiveRecord::Base
 		return startDate
 	end
 
+	def self.get_current_headlines
+		Headline.where("created_at >= ?", Headline.get_start_date)
+	end
+
+	def self.get_ten_random_current_headlines
+		offset = rand(Headline.count)
+		Headline.get_current_headlines.offset(offset)
+	end
+
 	def extract_tags
 		tags = self.name.split.delete_if { |item| item.size < 3 }
 	end

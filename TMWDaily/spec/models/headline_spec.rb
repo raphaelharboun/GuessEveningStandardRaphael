@@ -36,6 +36,24 @@ describe Headline do
 
 	end
 
+	describe "User mutliple users" do
 
+		before :each do
+			15.times do |i|
+				user = Factory.build(:user)
+				user.skip_confirmation!
+				user.save
+				user.headlines.build :name => "Headline"
+				user.save 
+			end
+		end
+
+		it "should get 10 headlines randomly" do
+			@headlines = Headline.get_ten_random_current_headline
+			@headlines.count.should == 10
+		end
+
+
+	end
 	
 end

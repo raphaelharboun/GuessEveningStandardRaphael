@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "Headlines" do
-  describe "Not Log in" do
+  describe "Public Access" do
   	
   	it "prevent unidentified person to post headline" do
   		visit "/"
@@ -19,7 +19,7 @@ describe "Headlines" do
   	Warden.test_mode!
 
   	before :each do
-  		user = Factory(:user)
+  		user = Factory.build(:user)
   		user.skip_confirmation!
   		user.save!
   		login_as(user, :scope => :user)
@@ -41,11 +41,12 @@ describe "Headlines" do
   		click_button 'Print it!'
 
   		current_path.should == root_path
-  		page.should have_content "Headline can't be blank"
+  		page.should have_content "Name can't be blank"
   	end
 
   	Warden.test_reset!
   end
+
 
 
 end

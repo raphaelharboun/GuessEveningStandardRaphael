@@ -13,5 +13,11 @@ end
 
 
 class DevineUser < User
-	
+
+	def get_last_ten_headlines
+		headlines.order("created_at DESC").limit(10).select("name, created_at")
+	end
+
 end
+
+ 

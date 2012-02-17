@@ -14,9 +14,9 @@ TMWDaily::Application.routes.draw do
   #  get "/logout" => "devise/sessions#destroy"
   #end
 
+  match "/" => "headlines#create", :via => :post, :as => :new_index_headline
+  resources :headlines 
   root :to => "Headlines#new"
-  
-  resources :headlines
 
 
   # Sample of regular route:
