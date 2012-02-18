@@ -6,9 +6,13 @@ class Headline < ActiveRecord::Base
 	validates :name, :presence => true
 	validate :user_cant_save_multiples_headline_a_day
 
+	scope :current, lambda { where("created_at >= ?", Headline.get_start_date) }
+
+	after_save :create_tags_from_new_headline
+
 	def user_cant_save_multiples_headline_a_day
 		if self.user
-			unless self.user.headlines.where("created_at >= ?", Headline.get_start_date).empty?
+			unless self.user.headlines.current.empty?
 				errors.add :name, "User can't print two headline for the same issue"
 			end
 		end
@@ -23,16 +27,29 @@ class Headline < ActiveRecord::Base
 	end
 
 	def self.get_current_headlines
-		Headline.where("created_at >= ?", Headline.get_start_date)
+		Headline.current
 	end
 
 	def self.get_ten_random_current_headlines
-		offset = rand(Headline.count)
-		Headline.get_current_headlines.offset(offset)
+		Headline.current.order("random()").limit(10)
 	end
 
 	def extract_tags
 		tags = self.name.split.delete_if { |item| item.size < 3 }
 	end
+
+	private
+		def create_tags_from_new_headline
+			self.extract_tags.map{|item| item.capitalize}.each do |tag|
+				resultTag = Tag.current.find_by_name(tag)
+				if resultTag.nil? then
+					  self.tags.create :name => tag, :count => 1
+				else
+					resultTag.increment(:count)
+					resultTag.save
+					self.tags << resultTag
+				end
+			end
+		end
 
 end
