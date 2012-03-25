@@ -1,0 +1,27 @@
+<div class="hero-unit">
+	<h1><%= @current_headline.name %></h1>
+</div>
+
+<h2>Tags</h2>
+<table class="table">
+	<thead>
+		<tr>
+			<th>name</th>
+			<th>%</th>
+		</tr>
+	</thead>
+	<% tags = @current_headline.tags.order("count DESC").each do |tag| %>
+		<tr>
+			<td><%= tag.name %></td>
+			<td><%= (tag.count / @statistics[:tag_count] * 100).round(2) %>%</td>
+		</tr>
+	<% end %>
+	<tr>
+		<th>Total</th>
+		<% sum = 0 %>
+		<th><%= ((tags.map(&:count).inject { |sum, t| sum + t}) / @statistics[:tag_count] *100).round(0) %>%</th>
+	</tr>
+</table>
+
+<h2>Average</h2>
+<h3>Your length <%= tags.count %> <small>average lenght <%= @statistics[:average_length] %></small></h3>

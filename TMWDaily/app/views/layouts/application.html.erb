@@ -7,11 +7,43 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
+<div class="navbar navbar-fixed-top">
+	<div class="navbar-inner">
+		<div class="container">
+			<ul class="nav">
+				<li class="active"><%= nav_to "Home", root_path %></li>
+				<li><%= nav_to "My Headlines", me_headlines_path %></li>
+				<li class="divider-vertical"></li>
+			</ul>
+			<ul class="nav pull-right">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">My profile <b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li>
+							<% if user_signed_in? then %>
+								<li><a href="#">Account Detail</a></li>
+								<li><%= nav_to "Logout", destroy_user_sessions_path %></li>
+							<% else %>
+								<li><%= nav_to "Sign Up", new_user_account_path %></li>
+								<li><%= nav_to "Login",  new_user_session_path %></li>
+							<% end %>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
 
-<p class="notice"><%= notice %></p>
-<p class="alert"><%= alert %></p>
-
-<%= yield %>
+<div class="container">
+	<% if flash[:notice] %>
+		<div class="alert alert-notice">
+			<a class="close" data-dismiss="alert">×</a>
+			<%= flash[:notice] %>
+		</div>
+	<% end %>
+	<%= yield %>
+</div>
 
 </body>
 </html>

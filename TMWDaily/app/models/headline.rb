@@ -4,11 +4,12 @@ class Headline < ActiveRecord::Base
 
 	validates :user_id, :presence =>true
 	validates :name, :presence => true
-	validate :user_cant_save_multiples_headline_a_day
+	validate :user_cant_save_multiples_headline_a_day, :on => :create
 
 	scope :current, lambda { where("created_at >= ?", Headline.get_start_date) }
+	scope :history, lambda { where("created_at < ?", Headline.get_start_date).order("created_at DESC") }
 
-	after_save :create_tags_from_new_headline
+	after_create :create_tags_from_new_headline
 
 	def user_cant_save_multiples_headline_a_day
 		if self.user
@@ -26,16 +27,54 @@ class Headline < ActiveRecord::Base
 		return startDate
 	end
 
-	def self.get_current_headlines
-		Headline.current
-	end
-
-	def self.get_ten_random_current_headlines
-		Headline.current.order("random()").limit(10)
+	def self.get_random_current_headlines(n)
+		Headline.current.order("random()").limit(n)
 	end
 
 	def extract_tags
 		tags = self.name.split.delete_if { |item| item.size < 3 }
+	end
+
+	def get_statistics
+		tag_count = Tag.current.sum("count").to_f
+		average_length = (Headline.current.map { |h| h.tags.count }).inject { |sum,t| sum + t}
+		return {:tag_count => tag_count, :average_length => average_length}
+	end
+
+	def to_param
+		"#{id}-#{name.parameterize}"
+	end
+
+	###########
+	# SCORING #
+	###########
+
+	def set_score
+		set_score_by_tags
+		set_score_by_headline_length
+	end
+
+	def set_score_by_tags
+		tags.each do |tag|
+			tag.headlines.each do |headline|
+				if headline.user.type == 'User'
+					headline.score += tag.name.length
+					headline.save!
+				end
+			end
+		end
+	end
+
+	def set_score_by_headline_length
+		devine_tags_count = tags.count
+		Headline.current.each do |headline|
+			if headline.user.type == 'User'
+				tags_count = headline.tags.count
+				total = 3 - (devine_tags_count - tags_count).abs
+				headline.score += total >= 0 ? total : 0
+				headline.save!
+			end
+		end
 	end
 
 	private
@@ -43,9 +82,11 @@ class Headline < ActiveRecord::Base
 			self.extract_tags.map{|item| item.capitalize}.each do |tag|
 				resultTag = Tag.current.find_by_name(tag)
 				if resultTag.nil? then
-					  self.tags.create :name => tag, :count => 1
+					  t = self.tags.create :name => tag, :count => 0
+					  t.increment(:count) if self.user.type == 'User'
+					  t.save
 				else
-					resultTag.increment(:count)
+					resultTag.increment(:count) if self.user.type == "User"
 					resultTag.save
 					self.tags << resultTag
 				end

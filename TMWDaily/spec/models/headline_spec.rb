@@ -73,11 +73,67 @@ describe Headline do
 		end
 
 		it "should get 10 last headlines randomly" do
-			@headlines = Headline.get_ten_random_current_headlines
+			@headlines = Headline.get_random_current_headlines 10
 			@headlines.count.should == 10
 			@headlines.each do |headline|
 				headline.created_at.should >= Headline.get_start_date
 			end
+		end
+
+	end
+
+	describe "devineUser" do
+
+		it "shouldn't increase tag count for devineUser" do
+			devine = Factory.build(:devineUser)
+			devine.skip_confirmation!
+			devine.save
+			Tag.count.should == 0
+			devine.headlines.create :name => "Devine New Headline"
+			Tag.count.should == 3
+			Tag.all.each do |tag|
+				tag.count.should == 0
+			end
+		end
+
+	end
+
+	describe "Scoring" do
+
+		before :each do
+			user = Factory.build(:user)
+			user.skip_confirmation!
+			user.save
+			devineuser = Factory.build(:devineUser)
+			devineuser.skip_confirmation!
+			devineuser.save
+			devineuser.headlines.create :name => "My new Headline"
+		end
+
+		it "should increase score by tag" do
+			devine = DevineUser.first
+			user = User.first
+			user.headlines.create :name => "My new Headline"
+			devine_headline = devine.headlines.first
+			devine_headline.set_score_by_tags
+			user.headlines.first.score.should == 11
+		end
+
+		it "should increase score by headline length" do
+			devine = DevineUser.first
+			devine_headline = devine.headlines.first
+			user = User.standard.first	
+			user.headlines.create :name => "My new Headline should say zero score"
+			devine_headline.set_score_by_headline_length
+			user.headlines.first.score.should == 0
+		end
+
+		it "should correctly score headline" do
+			devine_headline = DevineUser.first.headlines.first
+			user = User.standard.first
+			user.headlines.create :name => "My new Headline"
+			devine_headline.set_score
+			user.headlines.first.score.should == 14
 		end
 
 	end

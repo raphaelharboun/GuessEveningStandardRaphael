@@ -11,4 +11,5 @@ require 'spec_helper'
 #   end
 # end
 describe HeadlinesHelper do
+
 end

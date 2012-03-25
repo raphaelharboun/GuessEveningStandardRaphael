@@ -1,5 +1,8 @@
 class User < ActiveRecord::Base
 	has_many :headlines
+	scope :standard, where(:type => 'User')
+	scope :devine, where(:type => 'DevineUser')
+	scope :current, lambda { joins(:headlines).where("headlines.created_at >= ?", Headline.get_start_date) }
 
  	 # Include default devise modules. Others available are:
  	 # :token_authenticatable, :encryptable, :lockable, :timeoutable and :omniauthable
@@ -8,16 +11,14 @@ class User < ActiveRecord::Base
  	        :confirmable
 	
  	 # Setup accessible (or protected) attributes for your model
- 	 attr_accessible :email, :password, :password_confirmation, :remember_me
+ 	 attr_accessible :email, :password, :password_confirmation, :remember_me, :type
+
+ 	 def has_current_headline?
+ 	 	!headlines.current.empty?
+ 	 end
 end
 
 
-class DevineUser < User
 
-	def get_last_ten_headlines
-		headlines.order("created_at DESC").limit(10).select("name, created_at")
-	end
-
-end
 
  

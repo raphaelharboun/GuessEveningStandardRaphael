@@ -1,5 +1,8 @@
 TMWDaily::Application.routes.draw do
 
+  ActiveAdmin.routes(self)
+  devise_for :admin_users, ActiveAdmin::Devise.config
+
   devise_for :users, :controllers => {:sessions => 'devise:sessions'}, :skip => [:sessions] do
     get 'login'   => 'devise/sessions#new',         :as => :new_user_session         
     post 'login'  => 'devise/sessions#create',      :as => :user_session          
@@ -15,7 +18,14 @@ TMWDaily::Application.routes.draw do
   #end
 
   match "/" => "headlines#create", :via => :post, :as => :new_index_headline
-  resources :headlines 
+  scope "me" do
+    match "headlines" => "headlines#me_index", :via => :get, :as => :me_headlines
+    match "current" => "headlines#show_current", :via => :get, :as => :me_current_headline
+    match "headline/:id" => "headlines#show", :via => :get, :as => :me_headline
+  end
+  match "user/:id/headlines" => "headlines#index", :via => :get, :as => :user_headlines
+  match "user/:user_id/headline/:headline_id" => "headlines#show", :via => :get, :as => :user_headline
+
   root :to => "Headlines#new"
 
 

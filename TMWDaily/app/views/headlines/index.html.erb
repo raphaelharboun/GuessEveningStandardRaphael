@@ -1,0 +1,14 @@
+<% if @current_headline then %>
+	<%= render "currentHeadline" %>
+<% end %>
+
+<h2>Previous Headlines</h2>
+<table class="table table-striped">
+	<% @headlines.each do |headline| %>
+		<tr>
+			<td><%= link_to headline.name, current_page?(:action => 'me_index') ? me_headline_path(headline) : user_headline_path(@user,headline) %></td>
+			<td><%= link_to headline.created_at, "#" %></td>
+			<td></td>
+		</tr>
+	<% end %>
+</div>
