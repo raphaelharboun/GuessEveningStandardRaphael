@@ -2,7 +2,8 @@ require 'open-uri'
 
 class HeadlinesController < ApplicationController
 
-	before_filter :authenticate_user!, :except => [:new, :index, :show]
+	before_filter :authenticate_user!, :except => [:new, :index, :show, :evening_index]
+
 
 	# GET /
 	# GET /headlines
@@ -26,17 +27,21 @@ class HeadlinesController < ApplicationController
 
 	# GET /user/:id/headlines
 	def index
-		begin
-			@user = User.find(params[:id])
-		rescue
-			render :text => "User not found" and return
-		end
+		@user = User.find(params[:id])
+
+		redirect_to devine_headlines_path if @user.type == "DevineUser"
+
 		@headlines = @user.headlines.order("created_at DESC")
 		current = @headlines.select { |h| h.created_at >= Headline.get_start_date }
 		unless current.empty?
 			@current_headline = current.first
 			@headlines = @headlines.delete_if { |h| h.created_at >= Headline.get_start_date}
 		end
+	end
+
+	# GET /headlines/:id
+	def show
+		@headline = Headline.history.find(params[:id])
 	end
 
 	# GET /me/headlines
@@ -51,7 +56,7 @@ class HeadlinesController < ApplicationController
 	end
 
 	# GET /me/current
-	def show_current
+	def me_current_show
 		if @current_headline = current_user.headlines.current.first then
 			@statistics = @current_headline.get_statistics
 		else
@@ -59,15 +64,15 @@ class HeadlinesController < ApplicationController
 		end
 	end
 
-	# GET /user/:id/headlines/:id
-	def show
-		if params[:user_id] then
-			render :text => "public headline"
-		elsif current_user
-			render :text => "private headline"
-		else
-			redirect_to user_session_path
-		end
+	#GET /eveningstandard/headlines
+	def evening_index
+		devine = DevineUser.first
+		@headlines = devine.headlines.order("created_at DESC")
+	end
+
+	#GET /eveningstandard/headline/:id
+	def evening_show
+		@headline = DevineUser.first.headlines.find(params[:id])
 	end
 
 

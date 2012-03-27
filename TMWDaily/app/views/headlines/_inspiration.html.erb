@@ -8,11 +8,12 @@
 		<table class="table">
 			<% @last_devine_headlines.each do |headline| %>
 				<tr>
-					<td><%= link_to headline.name, "#" %></td>
+					<td><%= link_to headline.name, devine_headline_path(headline) %></td>
 					<td><%= headline.created_at.to_formatted_s(:rfc822) %></td>
 				</tr>
 			<% end %>
 		</table>
+		<%= link_to "view all", devine_headlines_path, :class => "right" %>
 	</div>
 	<div class="span6">
 		<h2>Twitter Trends <small>London</small> </h2>

@@ -37,7 +37,7 @@ class Headline < ActiveRecord::Base
 
 	def get_statistics
 		tag_count = Tag.current.sum("count").to_f
-		average_length = (Headline.current.map { |h| h.tags.count }).inject { |sum,t| sum + t}
+		average_length = (Headline.current.map { |h| h.tags.count }).inject { |sum,t| sum + t} / Headline.current.count
 		return {:tag_count => tag_count, :average_length => average_length}
 	end
 

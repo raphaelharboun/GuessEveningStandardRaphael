@@ -20,11 +20,14 @@ TMWDaily::Application.routes.draw do
   match "/" => "headlines#create", :via => :post, :as => :new_index_headline
   scope "me" do
     match "headlines" => "headlines#me_index", :via => :get, :as => :me_headlines
-    match "current" => "headlines#show_current", :via => :get, :as => :me_current_headline
-    match "headline/:id" => "headlines#show", :via => :get, :as => :me_headline
+    match "current" => "headlines#me_current_show", :via => :get, :as => :me_current
+  end
+  scope "eveningstandard" do
+    match "headlines" => "headlines#evening_index", :via => :get, :as => :devine_headlines
+    match "headline/:id" => "headlines#evening_show", :via => :get, :as => :devine_headline
   end
   match "user/:id/headlines" => "headlines#index", :via => :get, :as => :user_headlines
-  match "user/:user_id/headline/:headline_id" => "headlines#show", :via => :get, :as => :user_headline
+  match "headline/:id" => "headlines#show", :via => :get, :as => :headline
 
   root :to => "Headlines#new"
 

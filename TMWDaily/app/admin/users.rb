@@ -11,6 +11,7 @@ ActiveAdmin.register User do
 
 	index do
 		column :id
+		column :username
 		column :email
 		column "headlines" do |user|
 			link_to "#{user.headlines.count} headlines", admin_user_path(user)

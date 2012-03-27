@@ -11,7 +11,7 @@ class User < ActiveRecord::Base
  	        :confirmable
 	
  	 # Setup accessible (or protected) attributes for your model
- 	 attr_accessible :email, :password, :password_confirmation, :remember_me, :type
+ 	 attr_accessible :email, :password, :password_confirmation, :remember_me, :type, :username
 
  	 def has_current_headline?
  	 	!headlines.current.empty?
